@@ -9,8 +9,8 @@ articles.forEach((article) => {
   // Créer un nouvel élément a avec l'attribut href
   const aElement = document.createElement("a");
   const urlParams = new URLSearchParams(window.location.search);
-  const nameParam = encodeURIComponent(article.name);
-  urlParams.set("name", nameParam);
+  const nameParam = encodeURIComponent(article._id); //encodage pour les caractères spéciaux
+  urlParams.set("id", nameParam);
   aElement.href = `product.html?${urlParams.toString()}`;
 
   // Créer un nouvel élément article
