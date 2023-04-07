@@ -51,7 +51,6 @@ getProduct(id).then(() => {
 
 //Action lors de l'ajout au panier
 const addToCart = document.querySelector("#addToCart");
-let cart = [];
 
 addToCart.addEventListener("click", () => {
   const selectColor = document.querySelector("#colors");
@@ -61,7 +60,7 @@ addToCart.addEventListener("click", () => {
   const color = selectColor.value;
   const number = selectNumber.value;
 
-  //Si toutes les infos ne sont pas remplis
+  //Si toutes les infos ne sont pas remplies
   if (color == null || number == 0) {
     alert("Veuillez remplir tous les champs nécessaires");
     return;
@@ -69,7 +68,15 @@ addToCart.addEventListener("click", () => {
 
   const newProduct = { id, color, number };
 
-  //Vérifier si l'article existe déjà dans le panier
+  // Récupérer le contenu actuel du panier dans le localStorage
+  const cartJSON = localStorage.getItem("cart");
+  let cart = [];
+
+  if (cartJSON != null) {
+    cart = JSON.parse(cartJSON);
+  }
+
+  // Vérifier si l'article existe déjà dans le panier
   let productExists = false;
   for (let i = 0; i < cart.length; i++) {
     if (cart[i].id === newProduct.id && cart[i].color === newProduct.color) {
@@ -81,16 +88,15 @@ addToCart.addEventListener("click", () => {
     }
   }
 
-  //S'il n'existe pas encore, ajouter au panier
+  // S'il n'existe pas encore, ajouter au panier
   if (!productExists) {
     cart.push(newProduct);
   }
   console.log(cart);
 
   // Convertir le tableau en chaîne JSON
-  const cartJSON = JSON.stringify(cart);
-  console.log(cartJSON);
+  const updatedCartJSON = JSON.stringify(cart);
 
-  // Ajouter la chaîne JSON dans le local storage sous la clé "cart"
-  localStorage.setItem("cart", cartJSON);
+  // Enregistrer le tableau mis à jour dans le localStorage
+  localStorage.setItem("cart", updatedCartJSON);
 });
