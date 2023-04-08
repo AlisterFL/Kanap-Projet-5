@@ -2,6 +2,8 @@ let cart = JSON.parse(localStorage.getItem("cart"));
 console.log(cart);
 
 const sectionCartItems = document.querySelector("#cart__items");
+let totalPriceItems = 0;
+let totalQantityItems = 0;
 
 cart.forEach((items) => {
   let id = items.id; //récupère l'id de chaque item dans le panier
@@ -55,6 +57,18 @@ cart.forEach((items) => {
     inputQuantityProduct.value = items.number;
     console.log(items.number);
 
+    //modification du nombre d'article dans le LS
+    inputQuantityProduct.addEventListener("input", (event) => {
+      console.log(cart);
+      for (let i = 0; i < cart.length; i++) {
+        if (cart[i].id === items.id && cart[i].color === items.color) {
+          cart[i].number = event.target.value;
+        }
+      }
+      let cartJSON = JSON.stringify(cart);
+      localStorage.setItem("cart", cartJSON);
+    });
+
     //supprimer du panier
     const divDeleteProduct = document.createElement("div");
     divDeleteProduct.classList.add("cart__item__content__settings__delete");
@@ -62,14 +76,28 @@ cart.forEach((items) => {
     deleteProduct.classList.add("deleteItem");
     deleteProduct.innerText = "Supprimer";
 
+    //Supression de l'article Event
     divDeleteProduct.addEventListener("click", () => {
-      console.log("supprimé");
-      console.log(items);
-      localStorage.clear(items);
+      //Récupération de l'objet à supprimer puis réupload du LS
+      for (let i = 0; i < cart.length; i++) {
+        if (cart[i].id === items.id && cart[i].color === items.color) {
+          cart.splice(i, 1);
+        }
+      }
+      let cartJSON = JSON.stringify(cart);
+      localStorage.setItem("cart", cartJSON);
       articleElement.remove();
-      //supprime de l'écran
-      //supprime LS
     });
+
+    //tatal articles
+    totalQantityItems += parseInt(items.number);
+    totalPriceItems += article.price * items.number;
+
+    console.log(totalPriceItems);
+    const totalQuantityProduct = document.querySelector("#totalQuantity");
+    const totalPriceProduct = document.querySelector("#totalPrice");
+    totalQuantityProduct.innerText = totalQantityItems;
+    totalPriceProduct.innerText = totalPriceItems;
 
     //AppendChild
     sectionCartItems.appendChild(articleElement);
