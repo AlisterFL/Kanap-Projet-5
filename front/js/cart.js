@@ -92,6 +92,7 @@ cart.forEach((items) => {
     //tatal articles
     totalQantityItems += parseInt(items.number);
     totalPriceItems += article.price * items.number;
+    console.log("test");
 
     console.log(totalPriceItems);
     const totalQuantityProduct = document.querySelector("#totalQuantity");
