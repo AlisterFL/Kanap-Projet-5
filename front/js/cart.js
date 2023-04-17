@@ -1,25 +1,33 @@
+import { reuploadLS } from "./tools.js";
+
 let cart = JSON.parse(localStorage.getItem("cart"));
-console.log(cart);
 
 const sectionCartItems = document.querySelector("#cart__items");
-let totalPriceItems = 0;
-let totalQantityItems = 0;
+const totalQantity = document.getElementById("totalQuantity");
+const totalPrice = document.getElementById("totalPrice");
+let qtyItem = 0;
+let priceAllItems = 0;
+let articlePrice = 0;
 
-cart.forEach((items) => {
-  let id = items.id; //récupère l'id de chaque item dans le panier
+cart.forEach((item) => {
+  let id = item.id; //récupère l'id de chaque item dans le panier
   console.log(id);
 
   //Récuperation des informations du produit
   async function getProduct(id) {
-    const response = await fetch(`http://localhost:3000/api/products/${id}`);
-    article = await response.json();
-    console.log(article);
+    const article = await fetch(
+      `http://localhost:3000/api/products/${id}`
+    ).then((a) => a.json());
+    console.log("LISTE: " + article.price);
+
+    console.log(item);
+    articlePrice = article.price;
 
     // Créer un élément article
     const articleElement = document.createElement("article");
     articleElement.classList.add("cart__item");
-    articleElement.setAttribute("data-id", article._id);
-    articleElement.setAttribute("data-color", items.color);
+    articleElement.setAttribute("data-id", item.id);
+    articleElement.setAttribute("data-color", item.color);
 
     //création de la div pour l'image
     const divImage = document.createElement("div");
@@ -37,7 +45,7 @@ cart.forEach((items) => {
     const nameProduct = document.createElement("h2");
     nameProduct.innerText = article.name;
     const colorProduct = document.createElement("p");
-    colorProduct.innerText = items.color;
+    colorProduct.innerText = item.color;
     const priceProduct = document.createElement("p");
     priceProduct.innerText = article.price + " €";
     //option article panier
@@ -54,20 +62,7 @@ cart.forEach((items) => {
     inputQuantityProduct.name = "itemQuantity";
     inputQuantityProduct.min = 1;
     inputQuantityProduct.max = 100;
-    inputQuantityProduct.value = items.number;
-    console.log(items.number);
-
-    //modification du nombre d'article dans le LS
-    inputQuantityProduct.addEventListener("input", (event) => {
-      console.log(cart);
-      for (let i = 0; i < cart.length; i++) {
-        if (cart[i].id === items.id && cart[i].color === items.color) {
-          cart[i].number = event.target.value;
-        }
-      }
-      let cartJSON = JSON.stringify(cart);
-      localStorage.setItem("cart", cartJSON);
-    });
+    inputQuantityProduct.value = item.quantity;
 
     //supprimer du panier
     const divDeleteProduct = document.createElement("div");
@@ -75,30 +70,6 @@ cart.forEach((items) => {
     const deleteProduct = document.createElement("p");
     deleteProduct.classList.add("deleteItem");
     deleteProduct.innerText = "Supprimer";
-
-    //Supression de l'article Event
-    divDeleteProduct.addEventListener("click", () => {
-      //Récupération de l'objet à supprimer puis réupload du LS
-      for (let i = 0; i < cart.length; i++) {
-        if (cart[i].id === items.id && cart[i].color === items.color) {
-          cart.splice(i, 1);
-        }
-      }
-      let cartJSON = JSON.stringify(cart);
-      localStorage.setItem("cart", cartJSON);
-      articleElement.remove();
-    });
-
-    //tatal articles
-    totalQantityItems += parseInt(items.number);
-    totalPriceItems += article.price * items.number;
-    console.log("test");
-
-    console.log(totalPriceItems);
-    const totalQuantityProduct = document.querySelector("#totalQuantity");
-    const totalPriceProduct = document.querySelector("#totalPrice");
-    totalQuantityProduct.innerText = totalQantityItems;
-    totalPriceProduct.innerText = totalPriceItems;
 
     //AppendChild
     sectionCartItems.appendChild(articleElement);
@@ -118,7 +89,58 @@ cart.forEach((items) => {
     //supr
     divSettingsProduct.appendChild(divDeleteProduct);
     divDeleteProduct.appendChild(deleteProduct);
+
+    modificationQuantityOfProduct(inputQuantityProduct, item, cart);
+    deleteTheProduct(deleteProduct, item, cart, articleElement);
+
+    qtyItem += parseInt(item.quantity);
+    priceAllItems = qtyItem * articlePrice;
+
+    totalQantity.innerText = qtyItem;
+    totalPrice.innerText = priceAllItems;
   }
 
   getProduct(id);
 });
+
+//Prix & nombre TOTAL articles
+
+function modificationQuantityOfProduct(inputQuantityProduct, item, cart) {
+  inputQuantityProduct.addEventListener("input", (event) => {
+    qtyItem = 0;
+    priceAllItems = 0;
+    for (let i = 0; i < cart.length; i++) {
+      if (cart[i].id === item.id && cart[i].color === item.color) {
+        cart[i].quantity = event.target.value;
+      }
+      qtyItem += parseInt(cart[i].quantity);
+      priceAllItems = qtyItem * articlePrice;
+      console.log("qty item : " + qtyItem);
+      console.log("total prix : " + priceAllItems);
+      console.log("PRIX : " + articlePrice);
+      //affichage des totaux
+      totalQantity.innerText = qtyItem;
+      totalPrice.innerText = priceAllItems;
+    }
+    reuploadLS("cart", cart);
+  });
+}
+
+function deleteTheProduct(deleteProduct, item, cart, articleElement) {
+  deleteProduct.addEventListener("click", () => {
+    //Récupération de l'objet à supprimer puis réupload du LS
+    for (let i = 0; i < cart.length; i++) {
+      if (cart[i].id === item.id && cart[i].color === item.color) {
+        qtyItem -= parseInt(cart[i].quantity);
+        console.log(qtyItem);
+        cart.splice(i, 1);
+      }
+      priceAllItems = qtyItem * articlePrice;
+      //affichage des totaux
+      totalQantity.innerText = qtyItem;
+      totalPrice.innerText = priceAllItems;
+    }
+    reuploadLS("cart", cart);
+    articleElement.remove();
+  });
+}

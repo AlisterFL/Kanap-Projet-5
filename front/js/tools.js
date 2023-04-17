@@ -11,9 +11,8 @@ function getDataFromUrl(key) {
   return params.get(key);
 }
 
-function store(key, value) {
+function reuploadLS(key, value) {
   //upload le local storage, directement en JSON
   localStorage.setItem(key, JSON.stringify(value));
 }
-
-export { getDataFromUrl, store };
+export { getDataFromUrl, reuploadLS };

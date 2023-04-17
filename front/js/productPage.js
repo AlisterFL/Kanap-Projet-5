@@ -1,10 +1,40 @@
-import { getDataFromUrl, store } from "./tools.js";
+import { getDataFromUrl, reuploadLS } from "./tools.js";
 
 const id = getDataFromUrl("id");
 let article = await getProduct(id);
 
 display(article);
 listenForCartAddition(article);
+
+function display(article) {
+  //Ajout du nom de l'article en titre de page
+  const titlePage = document.querySelector("title");
+  titlePage.innerText = article.name;
+
+  //Ajout de l'image de l'article
+  const imageDiv = document.querySelector(".item__img");
+  const imageElement = document.createElement("img");
+  imageElement.src = article.imageUrl;
+  imageElement.alt = article.description;
+
+  imageDiv.appendChild(imageElement);
+
+  //Ajout du titre de l'article
+  document.querySelector("#title").textContent = article.name;
+  //Ajout du prix de l'article
+  document.querySelector("#price").textContent = article.price;
+  //Ajout de la description
+  document.querySelector("#description").textContent = article.description;
+  //Ajout des options de couleur
+  const selectColor = document.querySelector("#colors");
+  const colors = article.colors;
+  colors.forEach((color) => {
+    const colorOption = document.createElement("option");
+    colorOption.value = color;
+    colorOption.textContent = color;
+    selectColor.appendChild(colorOption);
+  });
+}
 
 function listenForCartAddition(article) {
   //Action lors de l'ajout au panier
@@ -14,6 +44,7 @@ function listenForCartAddition(article) {
   addToCart.addEventListener("click", () => {
     const color = document.querySelector("#colors").value;
     const quantity = document.querySelector("#quantity").value;
+    console.log(quantity);
     const id = article._id;
 
     //Si toutes les infos ne sont pas remplies
@@ -63,41 +94,11 @@ function listenForCartAddition(article) {
     }
     console.log(cart);
 
-    store("cart", cart);
+    reuploadLS("cart", cart);
     alert(
       "Votre produit a bien été ajouté ! \n Vous allez être redirigé vers l'accueil"
     );
     window.location.href = "index.html";
-  });
-}
-
-function display(article) {
-  //Ajout du nom de l'article en titre de page
-  const titlePage = document.querySelector("title");
-  titlePage.innerText = article.name;
-
-  //Ajout de l'image de l'article
-  const imageDiv = document.querySelector(".item__img");
-  const imageElement = document.createElement("img");
-  imageElement.src = article.imageUrl;
-  imageElement.alt = article.description;
-
-  imageDiv.appendChild(imageElement);
-
-  //Ajout du titre de l'article
-  document.querySelector("#title").textContent = article.name;
-  //Ajout du prix de l'article
-  document.querySelector("#price").textContent = article.price;
-  //Ajout de la description
-  document.querySelector("#description").textContent = article.description;
-  //Ajout des options de couleur
-  const selectColor = document.querySelector("#colors");
-  const colors = article.colors;
-  colors.forEach((color) => {
-    const colorOption = document.createElement("option");
-    colorOption.value = color;
-    colorOption.textContent = color;
-    selectColor.appendChild(colorOption);
   });
 }
 
