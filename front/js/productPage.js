@@ -1,4 +1,4 @@
-import { getDataFromUrl, reuploadLS } from "./tools.js";
+import { getDataFromUrl, refreshLS } from "./tools.js";
 
 const id = getDataFromUrl("id");
 let article = await getProduct(id);
@@ -94,7 +94,7 @@ function listenForCartAddition(article) {
     }
     console.log(cart);
 
-    reuploadLS("cart", cart);
+    refreshLS("cart", cart);
     alert(
       "Votre produit a bien été ajouté ! \n Vous allez être redirigé vers l'accueil"
     );

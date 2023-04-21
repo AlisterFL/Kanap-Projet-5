@@ -11,8 +11,47 @@ function getDataFromUrl(key) {
   return params.get(key);
 }
 
-function reuploadLS(key, value) {
+function refreshLS(key, value) {
   //upload le local storage, directement en JSON
   localStorage.setItem(key, JSON.stringify(value));
 }
-export { getDataFromUrl, reuploadLS };
+
+function updateQtyInLS(articles, cart) {
+  for (let i = 0; i < articles.length; i++) {
+    if (
+      cart[i].id === articles[i]._id &&
+      cart[i].quantity !== articles[i].quantity
+    ) {
+      cart[i].quantity = articles[i].quantity;
+      console.log("cart :", cart);
+      console.log("articles :", articles);
+    }
+  }
+}
+
+function updateItemInLS(articles, cart) {
+  cart.forEach((b, index) => {
+    const articleIndex = articles.findIndex(
+      (a) => a.id === b.id && a.color === b.color
+    );
+    if (articleIndex === -1) {
+      // si objet n'existe pas
+      cart.splice(index, 1);
+      console.log("cart :", cart);
+      console.log("articles :", articles);
+    }
+  });
+}
+
+function testRegex(regex, toTest, idError, name) {
+  if (regex.test(toTest.value)) {
+    document.querySelector(`#${idError}`).innerText = "";
+    return true;
+  } else {
+    document.querySelector(`#${idError}`).innerText =
+      "Le champ " + name + " est invalide ";
+    return false;
+  }
+}
+
+export { getDataFromUrl, refreshLS, updateQtyInLS, updateItemInLS, testRegex };
