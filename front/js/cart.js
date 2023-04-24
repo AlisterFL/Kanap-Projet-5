@@ -1,9 +1,4 @@
-import {
-  refreshLS,
-  updateQtyInLS,
-  updateItemInLS,
-  testRegex,
-} from "./tools.js";
+import { refreshLS } from "./tools.js";
 
 let cart = JSON.parse(localStorage.getItem("cart"));
 
@@ -16,24 +11,34 @@ checkForm();
 
 function listenForQtyChange(articles) {
   articles.forEach((a) => {
-    //Change qty of article
     const el = document.querySelector(
       `.cart__item[data-id="${a._id}"][data-color="${a.color}"] .itemQuantity`
     );
-    el.addEventListener("input", () => {
-      const value = Number(el.value);
-      console.log(typeof value);
-      if (isNaN(value) || value < 0 || value > 100) {
+
+    let oldValue = Number(el.value); // stocke la dernière valeur valide
+
+    el.addEventListener("change", () => {
+      console.log(oldValue);
+      if (
+        el.value === "" ||
+        Number.isNaN(el.value) ||
+        el.value < 0 ||
+        el.value > 100 ||
+        isNaN(Number(el.value))
+      ) {
         alert("Veuillez choisir une quantité acceptée");
-        el.value = 1;
+        el.value = oldValue; // restaure la dernière valeur valide
+      } else {
+        oldValue = Number(el.value); // met à jour la dernière valeur valide
       }
 
       const index = articles.findIndex(
         (b) => b._id === a._id && b.color === a.color
       );
       articles[index].quantity = Number(el.value);
+      cart[index].quantity = Number(el.value);
       totalCount(articles);
-      updateQtyInLS(articles, cart);
+      console.log(articles);
       refreshLS("cart", cart);
     });
   });
@@ -63,6 +68,20 @@ function deleteArticle(articles) {
         console.log("Vous avez choisi Annuler");
       }
     });
+  });
+}
+
+function updateItemInLS(articles, cart) {
+  cart.forEach((b, index) => {
+    const articleIndex = articles.findIndex(
+      (a) => a.id === b.id && a.color === b.color
+    );
+    if (articleIndex === -1) {
+      // si objet n'existe pas
+      cart.splice(index, 1);
+      console.log("cart :", cart);
+      console.log("articles :", articles);
+    }
   });
 }
 
@@ -144,6 +163,23 @@ function render(article) {
   return articleElement;
 }
 
+async function getAllArticlesData(cart) {
+  const list = [];
+  const data = await fetch(`http://localhost:3000/api/products/`).then((a) =>
+    a.json()
+  );
+
+  cart.forEach(async (item) => {
+    const article = data.find((a) => item.id == a._id);
+    const a = { ...article };
+    a.color = item.color;
+    a.quantity = Number(item.quantity);
+
+    list.push(a);
+  });
+  return list;
+}
+
 function totalCount(articles) {
   let total = 0;
   let qty = 0;
@@ -156,19 +192,15 @@ function totalCount(articles) {
   document.getElementById("totalPrice").innerText = total;
 }
 
-async function getAllArticlesData(cart) {
-  const list = [];
-  const data = await fetch(`http://localhost:3000/api/products/`).then((a) =>
-    a.json()
-  );
-
-  cart.forEach(async (item) => {
-    const article = data.find((a) => item.id == a._id);
-    (article.color = item.color), (article.quantity = Number(item.quantity));
-
-    list.push(article);
-  });
-  return list;
+function testRegex(regex, toTest, idError, name) {
+  if (regex.test(toTest.value)) {
+    document.querySelector(`#${idError}`).innerText = "";
+    return true;
+  } else {
+    document.querySelector(`#${idError}`).innerText =
+      "Le champ " + name + " est invalide ";
+    return false;
+  }
 }
 
 function checkForm() {
