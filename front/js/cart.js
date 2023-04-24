@@ -218,7 +218,7 @@ function postForm() {
 
   const dataForm = {
     contact,
-    cart: cartArray,
+    products: cartArray.map((a) => a.id),
   };
 
   console.log(dataForm);
@@ -233,7 +233,7 @@ function postForm() {
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
-      // document.location.href = "confirmation.html?id=" + data.orderId;
+      document.location.href = "confirmation.html?id=" + data.orderId;
     })
     .catch((error) => {
       console.error("Erreur:", error);
