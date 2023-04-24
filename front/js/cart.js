@@ -195,6 +195,47 @@ function checkForm() {
     console.log(regexTests);
     if (regexTests.every((result) => result === true)) {
       console.log("ok");
+      postForm();
     }
   });
+}
+
+function postForm() {
+  let cart = localStorage.cart;
+  console.log(JSON.parse(cart));
+
+  const cartArray = JSON.parse(cart);
+  console.log(cartArray);
+
+  const contact = {
+    firstName: document.getElementById("firstName").value,
+    lastName: document.getElementById("lastName").value,
+    address: document.getElementById("address").value,
+    city: document.getElementById("city").value,
+    email: document.getElementById("email").value,
+  };
+  console.log(contact);
+
+  const dataForm = {
+    contact,
+    cart: cartArray,
+  };
+
+  console.log(dataForm);
+
+  fetch("http://localhost:3000/api/products/order", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(dataForm),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      // document.location.href = "confirmation.html?id=" + data.orderId;
+    })
+    .catch((error) => {
+      console.error("Erreur:", error);
+    });
 }
