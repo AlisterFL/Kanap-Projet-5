@@ -227,6 +227,7 @@ function checkForm() {
     console.log(regexTests);
     if (regexTests.every((result) => result === true)) {
       console.log("ok");
+
       postForm();
     }
   });
@@ -265,6 +266,7 @@ function postForm() {
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
+      localStorage.removeItem("cart");
       document.location.href = "confirmation.html?id=" + data.orderId;
     })
     .catch((error) => {

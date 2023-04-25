@@ -2,6 +2,7 @@ import { getDataFromUrl, refreshLS } from "./tools.js";
 
 const id = getDataFromUrl("id");
 let article = await getProduct(id);
+console.log(article);
 
 display(article);
 listenForCartAddition(article);
@@ -104,5 +105,9 @@ function listenForCartAddition(article) {
 
 async function getProduct(id) {
   const response = await fetch(`http://localhost:3000/api/products/${id}`);
-  return await response.json();
+  if (!response.ok) {
+    const article = document.querySelector("article");
+    article.innerHTML = "Votre article est introuvable";
+  }
+  return response.json();
 }
