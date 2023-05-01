@@ -79,8 +79,6 @@ function updateItemInLS(articles, cart) {
     if (articleIndex === -1) {
       // si objet n'existe pas
       cart.splice(index, 1);
-      console.log("cart :", cart);
-      console.log("articles :", articles);
     }
   });
 }

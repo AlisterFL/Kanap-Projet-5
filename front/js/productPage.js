@@ -108,6 +108,7 @@ async function getProduct(id) {
   if (!response.ok) {
     const article = document.querySelector("article");
     article.innerHTML = "Votre article est introuvable";
+  } else {
+    return response.json();
   }
-  return response.json();
 }
