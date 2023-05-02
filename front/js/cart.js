@@ -2,12 +2,18 @@ import { refreshLS } from "./tools.js";
 
 let cart = JSON.parse(localStorage.getItem("cart"));
 
-const articles = await getAllArticlesData(cart);
-await display(articles);
-totalCount(articles);
-listenForQtyChange(articles);
-deleteArticle(articles);
-checkForm();
+if (!cart) {
+  document.querySelector("h1").innerText = "Votre panier est vide";
+  document.querySelector(".cart__price").remove();
+  document.querySelector(".cart__order").remove();
+} else {
+  const articles = await getAllArticlesData(cart);
+  await display(articles);
+  totalCount(articles);
+  listenForQtyChange(articles);
+  deleteArticle(articles);
+  checkForm();
+}
 
 function listenForQtyChange(articles) {
   articles.forEach((a) => {
